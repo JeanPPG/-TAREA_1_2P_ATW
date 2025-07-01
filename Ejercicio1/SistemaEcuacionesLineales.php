@@ -77,29 +77,64 @@ class SistemaLineal extends SistemaEcuaciones {
         ];
     }
 
-
     //Metodo publico que invoca al calculo de la solucion
     public function resolverSistema(): array {
         return $this -> calcularResultado();
     }
 }
 
+/**
+ * Menú principal de interacción por consola.
+ * Si se ejecuta bajo CLI, muestra opciones y sale al elegir "2".
+ */
+if (php_sapi_name() === 'cli') {
+    while (true) {
+        echo "\n=== Menú Sistema de Ecuaciones 2×2 ===\n";
+        echo "1) Resolver un sistema de dos ecuaciones\n";
+        echo "2) Salir\n";
+        echo "Seleccione una opción: ";
+        $opt = trim(fgets(STDIN));
 
-//Ejemplo de uso
+        if ($opt === '1') {
+            // Pedir coeficientes de la primera ecuación
+            echo "Ecuación 1:\n";
+            echo "  Coeficiente de x: ";
+            $x1 = (float) trim(fgets(STDIN));
+            echo "  Coeficiente de y: ";
+            $y1 = (float) trim(fgets(STDIN));
+            echo "  Término independiente: ";
+            $e1 = (float) trim(fgets(STDIN));
 
-$ec1 = ['x' => 2, 'y' => 3, 'indepediente' => 5];
-$ec2 = ['x' => 4, 'y' => 1, 'indepediente' => 6];
+            // Pedir coeficientes de la segunda ecuación
+            echo "Ecuación 2:\n";
+            echo "  Coeficiente de x: ";
+            $x2 = (float) trim(fgets(STDIN));
+            echo "  Coeficiente de y: ";
+            $y2 = (float) trim(fgets(STDIN));
+            echo "  Término independiente: ";
+            $e2 = (float) trim(fgets(STDIN));
 
-$sistema = new SistemaLineal($ec1, $ec2);
-$solucion = $sistema -> resolverSistema();
+            // Crear y resolver
+            $ec1 = ['x' => $x1, 'y' => $y1, 'indepediente' => $e1];
+            $ec2 = ['x' => $x2, 'y' => $y2, 'indepediente' => $e2];
+            $sistema = new SistemaLineal($ec1, $ec2);
 
+            try {
+                $sol = $sistema->resolverSistema();
+                echo "\nSolución:\n";
+                echo "  x = {$sol['x']}\n";
+                echo "  y = {$sol['y']}\n";
+            } catch (Exception $e) {
+                echo "Error: " . $e->getMessage() . "\n";
+            }
 
-echo "Sistema de ecuaciones:\n";
-echo "Ecuacion 1: $ec1[x]x + $ec1[y]y = $ec1[indepediente]\n";
-echo "Ecuacion 2: $ec2[x]x + $ec2[y]y = $ec2[indepediente]\n";
-
-echo "Solucion del sistema de ecuaciones:\n";
-echo "x= ".$solucion['x']. "\n";
-echo "y= ".$solucion['y']. "\n";
+        } elseif ($opt === '2') {
+            echo "Saliendo...\n";
+            exit(0);
+        } else {
+            echo "Opción no válida, inténtalo de nuevo.\n";
+        }
+    }
+}
 
 ?>
