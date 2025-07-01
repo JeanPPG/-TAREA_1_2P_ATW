@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Ejercicio 4: Operaciones con matrices
- * Clase abstracta que define métodos para operaciones con matrices
+ * Clase abstracta base que define operaciones comunes sobre matrices.
  */
 abstract class MatrizAbstracta
 {
@@ -13,7 +12,10 @@ abstract class MatrizAbstracta
         $this->matriz = $matriz;
     }
 
+    // Método abstracto para multiplicar matrices
     abstract public function multiplicar($matriz);
+    
+    // Método abstracto para calcular la inversa
     abstract public function inversa();
 
     public function getMatriz()
@@ -23,13 +25,12 @@ abstract class MatrizAbstracta
 }
 
 /**
- * Clase concreta que implementa operaciones con matrices
+ * Clase concreta que implementa operaciones sobre matrices
  */
 class Matriz extends MatrizAbstracta
 {
-
     /**
-     * Multiplica la matriz actual por otra matriz
+     * Multiplica la matriz actual por otra matriz.
      */
     public function multiplicar($matriz)
     {
@@ -56,44 +57,35 @@ class Matriz extends MatrizAbstracta
     }
 
     /**
-     * Calcula la matriz inversa usando eliminación de Gauss-Jordan
+     * Calcula la inversa de una matriz cuadrada usando eliminación Gauss-Jordan.
      */
     public function inversa()
     {
         $n = count($this->matriz);
 
-        // Verificar que la matriz sea cuadrada
         if ($n !== count($this->matriz[0])) {
-            throw new Exception("La matriz debe ser cuadrada para calcular la inversa");
+            throw new Exception("La matriz debe ser cuadrada para calcular la inversa.");
         }
 
-        // Crear matriz aumentada [A|I]
         $aumentada = [];
         for ($i = 0; $i < $n; $i++) {
-            for ($j = 0; $j < $n; $j++) {
-                $aumentada[$i][$j] = $this->matriz[$i][$j];
-            }
-            for ($j = $n; $j < 2 * $n; $j++) {
-                $aumentada[$i][$j] = ($j - $n == $i) ? 1 : 0;
-            }
+            $aumentada[$i] = array_merge($this->matriz[$i], array_fill(0, $n, 0));
+            $aumentada[$i][$i + $n] = 1; // añadir identidad
         }
 
-        // Eliminación de Gauss-Jordan
+        // Gauss-Jordan
         for ($i = 0; $i < $n; $i++) {
-            // Buscar el pivote
             $pivote = $aumentada[$i][$i];
             if (abs($pivote) < 1e-10) {
                 throw new Exception("La matriz no es invertible (determinante = 0)");
             }
 
-            // Normalizar la fila del pivote
             for ($j = 0; $j < 2 * $n; $j++) {
                 $aumentada[$i][$j] /= $pivote;
             }
 
-            // Eliminar la columna
             for ($k = 0; $k < $n; $k++) {
-                if ($k != $i) {
+                if ($k !== $i) {
                     $factor = $aumentada[$k][$i];
                     for ($j = 0; $j < 2 * $n; $j++) {
                         $aumentada[$k][$j] -= $factor * $aumentada[$i][$j];
@@ -102,12 +94,9 @@ class Matriz extends MatrizAbstracta
             }
         }
 
-        // Extraer la matriz inversa
         $inversa = [];
         for ($i = 0; $i < $n; $i++) {
-            for ($j = 0; $j < $n; $j++) {
-                $inversa[$i][$j] = $aumentada[$i][$j + $n];
-            }
+            $inversa[$i] = array_slice($aumentada[$i], $n);
         }
 
         return $inversa;
@@ -115,23 +104,19 @@ class Matriz extends MatrizAbstracta
 }
 
 /**
- * Función para calcular el determinante de una matriz
+ * Calcula el determinante de una matriz cuadrada usando expansión por cofactores.
  */
 function determinante($matriz)
 {
     $n = count($matriz);
 
     if ($n !== count($matriz[0])) {
-        throw new Exception("La matriz debe ser cuadrada para calcular el determinante");
+        throw new Exception("La matriz debe ser cuadrada");
     }
 
-    if ($n === 1) {
-        return $matriz[0][0];
-    }
+    if ($n === 1) return $matriz[0][0];
 
-    if ($n === 2) {
-        return $matriz[0][0] * $matriz[1][1] - $matriz[0][1] * $matriz[1][0];
-    }
+    if ($n === 2) return $matriz[0][0] * $matriz[1][1] - $matriz[0][1] * $matriz[1][0];
 
     $det = 0;
     for ($j = 0; $j < $n; $j++) {
@@ -139,125 +124,103 @@ function determinante($matriz)
         for ($i = 1; $i < $n; $i++) {
             $fila = [];
             for ($k = 0; $k < $n; $k++) {
-                if ($k !== $j) {
-                    $fila[] = $matriz[$i][$k];
-                }
+                if ($k !== $j) $fila[] = $matriz[$i][$k];
             }
             $submatriz[] = $fila;
         }
-
-        $cofactor = pow(-1, $j) * $matriz[0][$j] * determinante($submatriz);
-        $det += $cofactor;
+        $det += pow(-1, $j) * $matriz[0][j] * determinante($submatriz);
     }
 
     return $det;
 }
 
 /**
- * Función para mostrar una matriz de forma legible
+ * Muestra la matriz en formato bonito
  */
 function mostrarMatriz($matriz, $titulo = "Matriz")
 {
     echo "\n$titulo:\n";
     foreach ($matriz as $fila) {
         echo "| ";
-        foreach ($fila as $elemento) {
-            printf("%8.3f ", $elemento);
+        foreach ($fila as $valor) {
+            printf("%8.3f ", $valor);
         }
         echo "|\n";
     }
-    echo "\n";
 }
 
 /**
- * Función para leer una matriz desde la consola
+ * Solicita al usuario que ingrese una matriz completa línea por línea.
  */
-function leerMatriz($filas, $columnas, $nombre = "matriz")
+function ingresarMatrizManual($filas, $columnas, $nombre = "matriz")
 {
     $matriz = [];
-    echo "Ingrese los elementos de la $nombre ($filas x $columnas):\n";
-
+    echo "Ingresa los valores de la $nombre, separados por espacios:\n";
     for ($i = 0; $i < $filas; $i++) {
-        for ($j = 0; $j < $columnas; $j++) {
-            echo "Elemento [$i][$j]: ";
-            $matriz[$i][$j] = (float)trim(fgets(STDIN));
+        echo "Fila " . ($i + 1) . ": ";
+        $linea = readline();
+        $valores = array_map('floatval', explode(' ', $linea));
+        if (count($valores) !== $columnas) {
+            echo "Error: Debes ingresar exactamente $columnas valores.\n";
+            $i--;
+            continue;
         }
+        $matriz[] = $valores;
     }
-
     return $matriz;
 }
 
-// Programa principal
+// ========================== PROGRAMA PRINCIPAL ==========================
 echo "=== EJERCICIO 4: OPERACIONES CON MATRICES ===\n";
-
-echo "\nSeleccione una opción:\n";
 echo "1. Multiplicación de matrices\n";
-echo "2. Calcular inversa de una matriz\n";
+echo "2. Calcular inversa\n";
 echo "3. Calcular determinante\n";
-echo "Opción: ";
-
-$opcion = (int)trim(fgets(STDIN));
+$opcion = (int)readline("Elige una opción: ");
 
 switch ($opcion) {
     case 1:
-        echo "\nMULTIPLICACIÓN DE MATRICES\n";
-        echo "Dimensiones de la primera matriz:\n";
-        echo "Filas: ";
-        $filas1 = (int)trim(fgets(STDIN));
-        echo "Columnas: ";
-        $columnas1 = (int)trim(fgets(STDIN));
+        echo "\n--- Multiplicación de matrices ---\n";
+        $filas1 = (int)readline("Filas de la primera matriz: ");
+        $columnas1 = (int)readline("Columnas de la primera matriz: ");
+        $matriz1 = ingresarMatrizManual($filas1, $columnas1, "primera matriz");
 
-        $matriz1_array = leerMatriz($filas1, $columnas1, "primera matriz");
-        $matriz1 = new Matriz($matriz1_array);
+        $filas2 = (int)readline("Filas de la segunda matriz: ");
+        $columnas2 = (int)readline("Columnas de la segunda matriz: ");
+        $matriz2 = ingresarMatrizManual($filas2, $columnas2, "segunda matriz");
 
-        echo "\nDimensiones de la segunda matriz:\n";
-        echo "Filas: ";
-        $filas2 = (int)trim(fgets(STDIN));
-        echo "Columnas: ";
-        $columnas2 = (int)trim(fgets(STDIN));
+        $obj = new Matriz($matriz1);
+        $resultado = $obj->multiplicar($matriz2);
 
-        $matriz2_array = leerMatriz($filas2, $columnas2, "segunda matriz");
-
-        mostrarMatriz($matriz1_array, "Primera Matriz");
-        mostrarMatriz($matriz2_array, "Segunda Matriz");
-
-        $resultado = $matriz1->multiplicar($matriz2_array);
-        mostrarMatriz($resultado, "Resultado de la Multiplicación");
+        mostrarMatriz($matriz1, "Primera Matriz");
+        mostrarMatriz($matriz2, "Segunda Matriz");
+        mostrarMatriz($resultado, "Resultado");
         break;
 
     case 2:
-        echo "\nCÁLCULO DE MATRIZ INVERSA\n";
-        echo "Tamaño de la matriz cuadrada: ";
-        $n = (int)trim(fgets(STDIN));
+        echo "\n--- Cálculo de la inversa ---\n";
+        $n = (int)readline("Tamaño de la matriz cuadrada: ");
+        $matriz = ingresarMatrizManual($n, $n, "matriz");
 
-        $matriz_array = leerMatriz($n, $n, "matriz");
-        $matriz = new Matriz($matriz_array);
+        $obj = new Matriz($matriz);
+        mostrarMatriz($matriz, "Matriz original");
 
-        mostrarMatriz($matriz_array, "Matriz Original");
+        $inversa = $obj->inversa();
+        mostrarMatriz($inversa, "Matriz inversa");
 
-        $inversa = $matriz->inversa();
-        mostrarMatriz($inversa, "Matriz Inversa");
-
-        // Verificación
-        $verificacion = $matriz->multiplicar($inversa);
+        $verificacion = $obj->multiplicar($inversa);
         mostrarMatriz($verificacion, "Verificación (A × A⁻¹)");
         break;
 
     case 3:
-        echo "\nCÁLCULO DEL DETERMINANTE\n";
-        echo "Tamaño de la matriz cuadrada: ";
-        $n = (int)trim(fgets(STDIN));
+        echo "\n--- Cálculo del determinante ---\n";
+        $n = (int)readline("Tamaño de la matriz cuadrada: ");
+        $matriz = ingresarMatrizManual($n, $n, "matriz");
 
-        $matriz_array = leerMatriz($n, $n, "matriz");
-
-        mostrarMatriz($matriz_array, "Matriz");
-
-        $det = determinante($matriz_array);
+        mostrarMatriz($matriz, "Matriz");
+        $det = determinante($matriz);
         echo "Determinante: $det\n";
         break;
 
-
-
     default:
-        echo "Opción no válida.\n";
+        echo "Opción inválida.\n";
 }
