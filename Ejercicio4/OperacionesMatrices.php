@@ -14,7 +14,7 @@ abstract class MatrizAbstracta
 
     // Método abstracto para multiplicar matrices
     abstract public function multiplicar($matriz);
-    
+
     // Método abstracto para calcular la inversa
     abstract public function inversa();
 
@@ -128,7 +128,7 @@ function determinante($matriz)
             }
             $submatriz[] = $fila;
         }
-        $det += pow(-1, $j) * $matriz[0][j] * determinante($submatriz);
+        $det += pow(-1, $j) * $matriz[0][$j] * determinante($submatriz);
     }
 
     return $det;
