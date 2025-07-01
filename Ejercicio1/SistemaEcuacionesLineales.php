@@ -94,7 +94,7 @@ function readFloat(string $prompt): float {
         if (is_numeric($input)) {
             return (float) $input;
         }
-        echo "  Entrada no válida. Por favor, ingrese un número.\n";
+        echo "  Entrada no valida. Por favor, ingrese un numero.\n";
     }
 }
 
@@ -104,24 +104,24 @@ function readFloat(string $prompt): float {
  */
 if (php_sapi_name() === 'cli') {
     while (true) {
-        echo "\n=== Menú Sistema de Ecuaciones 2×2 ===\n";
+        echo "\n=== Menu Sistema de Ecuaciones 2×2 ===\n";
         echo "1) Resolver un sistema de dos ecuaciones\n";
         echo "2) Salir\n";
-        echo "Seleccione una opción: ";
+        echo "Seleccione una opcion: ";
         $opt = readline();
 
         if ($opt === '1') {
             // Pedir coeficientes de la primera ecuación
-            echo "Ecuación 1:\n";
+            echo "Ecuacion 1:\n";
             $x1 = readFloat("  Coeficiente de x: ");
             $y1 = readFloat("  Coeficiente de y: ");
-            $e1 = readFloat("  Término independiente: ");
+            $e1 = readFloat("  Termino independiente: ");
 
             // Pedir coeficientes de la segunda ecuación
-            echo "Ecuación 2:\n";
+            echo "Ecuacion 2:\n";
             $x2 = readFloat("  Coeficiente de x: ");
             $y2 = readFloat("  Coeficiente de y: ");
-            $e2 = readFloat("  Término independiente: ");
+            $e2 = readFloat("  Termino independiente: ");
 
             // Crear y resolver
             $ec1 = ['x' => $x1, 'y' => $y1, 'indepediente' => $e1];
@@ -130,7 +130,7 @@ if (php_sapi_name() === 'cli') {
 
             try {
                 $sol = $sistema->resolverSistema();
-                echo "\nSolución:\n";
+                echo "\nSolucion:\n";
                 echo "  x = {$sol['x']}\n";
                 echo "  y = {$sol['y']}\n";
             } catch (Exception $e) {
@@ -141,7 +141,7 @@ if (php_sapi_name() === 'cli') {
             echo "Saliendo...\n";
             exit(0);
         } else {
-            echo "Opción no válida, inténtalo de nuevo.\n";
+            echo "Opcion no valida, intentalo de nuevo.\n";
         }
     }
 }

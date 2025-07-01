@@ -77,7 +77,7 @@ if (php_sapi_name() === 'cli') {
         echo "2) Derivar polinomios\n";
         echo "3) Sumar polinomios\n";
         echo "4) Salir\n";
-        $opt = readline("Seleccione una opción: ");
+        $opt = readline("Seleccione una opcion: ");
 
         switch ($opt) {
             case '1':
@@ -146,7 +146,7 @@ if (php_sapi_name() === 'cli') {
                 exit(0);
             
             default:
-                echo "Opción no válida. Inténtalo de nuevo.\n";
+                echo "Opción no valida. Intentalo de nuevo.\n";
                 break;
         }
     }

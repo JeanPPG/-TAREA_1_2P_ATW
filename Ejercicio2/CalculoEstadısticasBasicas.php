@@ -71,13 +71,13 @@ if (php_sapi_name() === 'cli') {
     $dataSets = [];
 
     while (true) {
-        echo "\n=== Menú Estadísticas Básicas ===\n";
+        echo "\n=== Menú Estadisticas Básicas ===\n";
         echo "1) Agregar/Actualizar un conjunto de datos\n";
-        echo "2) Calcular estadísticas de un conjunto\n";
+        echo "2) Calcular estadisticas de un conjunto\n";
         echo "3) Generar informe de todos los conjuntos\n";
         echo "4) Salir\n";
 
-        $opt = readline("Selecciona opción: ");
+        $opt = readline("Selecciona opcion: ");
         if ($opt !== false && function_exists('readline_add_history')) readline_add_history($opt);
 
         switch (trim($opt)) {
@@ -91,17 +91,17 @@ if (php_sapi_name() === 'cli') {
 
             case '2':
                 if (empty($dataSets)) {
-                    echo "No hay conjuntos cargados. Añade uno primero.\n";
+                    echo "No hay conjuntos cargados. Anade uno primero.\n";
                     break;
                 }
-                $id = readline("¿De qué conjunto quieres las estadísticas? "); if ($id !== false) readline_add_history($id);
+                $id = readline("De que conjunto quieres las estadisticas? "); if ($id !== false) readline_add_history($id);
                 if (!isset($dataSets[$id])) {
                     echo "Conjunto '$id' no existe.\n";
                     break;
                 }
                 $stats = $estad->generarInforme([$id => $dataSets[$id]]); 
                 $s = $stats[$id];
-                echo "\nEstadísticas para '$id':\n";
+                echo "\nEstadisticas para '$id':\n";
                 echo "  Media:   " . ($s['media']   ?? '—') . "\n";
                 echo "  Mediana: " . ($s['mediana'] ?? '—') . "\n";
                 $m = $s['moda'];
@@ -124,11 +124,11 @@ if (php_sapi_name() === 'cli') {
                 break;
 
             case '4':
-                echo "¡Hasta luego!\n";
+                echo "Saliendo...\n";
                 exit(0);
 
             default:
-                echo "Opción no válida. Intenta de nuevo.\n";
+                echo "Opcion no valida. Intenta de nuevo.\n";
         }
     }
 }
