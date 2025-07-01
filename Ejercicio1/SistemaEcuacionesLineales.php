@@ -82,6 +82,21 @@ class SistemaLineal extends SistemaEcuaciones {
         return $this -> calcularResultado();
     }
 }
+/**
+ * Lee desde consola y valida que la entrada sea numérica.
+ * Devuelve el valor convertido a float.
+ */
+function readFloat(string $prompt): float {
+    while (true) {
+        $input = readline($prompt);
+        // Permitimos coma o punto como separador decimal
+        $input = str_replace(',', '.', $input);
+        if (is_numeric($input)) {
+            return (float) $input;
+        }
+        echo "  Entrada no válida. Por favor, ingrese un número.\n";
+    }
+}
 
 /**
  * Menú principal de interacción por consola.
@@ -93,26 +108,20 @@ if (php_sapi_name() === 'cli') {
         echo "1) Resolver un sistema de dos ecuaciones\n";
         echo "2) Salir\n";
         echo "Seleccione una opción: ";
-        $opt = trim(fgets(STDIN));
+        $opt = readline();
 
         if ($opt === '1') {
             // Pedir coeficientes de la primera ecuación
             echo "Ecuación 1:\n";
-            echo "  Coeficiente de x: ";
-            $x1 = (float) trim(fgets(STDIN));
-            echo "  Coeficiente de y: ";
-            $y1 = (float) trim(fgets(STDIN));
-            echo "  Término independiente: ";
-            $e1 = (float) trim(fgets(STDIN));
+            $x1 = readFloat("  Coeficiente de x: ");
+            $y1 = readFloat("  Coeficiente de y: ");
+            $e1 = readFloat("  Término independiente: ");
 
             // Pedir coeficientes de la segunda ecuación
             echo "Ecuación 2:\n";
-            echo "  Coeficiente de x: ";
-            $x2 = (float) trim(fgets(STDIN));
-            echo "  Coeficiente de y: ";
-            $y2 = (float) trim(fgets(STDIN));
-            echo "  Término independiente: ";
-            $e2 = (float) trim(fgets(STDIN));
+            $x2 = readFloat("  Coeficiente de x: ");
+            $y2 = readFloat("  Coeficiente de y: ");
+            $e2 = readFloat("  Término independiente: ");
 
             // Crear y resolver
             $ec1 = ['x' => $x1, 'y' => $y1, 'indepediente' => $e1];

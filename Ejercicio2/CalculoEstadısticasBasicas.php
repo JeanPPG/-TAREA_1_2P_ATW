@@ -65,52 +65,49 @@ class EstadisticaBasica extends Estadistica {
     }
 }
 
-// Función para leer con readline()
-function leerLinea(string $prompt): string {
-    $line = readline($prompt);
-    if ($line !== false && function_exists('readline_add_history')) {
-        readline_add_history($line);
-    }
-    return trim((string)$line);
-}
-
-// Menú principal
+// Menú principal usando readline() directamente
 if (php_sapi_name() === 'cli') {
     $estad = new EstadisticaBasica();
     $dataSets = [];
+
     while (true) {
         echo "\n=== Menú Estadísticas Básicas ===\n";
         echo "1) Agregar/Actualizar un conjunto de datos\n";
         echo "2) Calcular estadísticas de un conjunto\n";
         echo "3) Generar informe de todos los conjuntos\n";
         echo "4) Salir\n";
-        $opt = leerLinea("Selecciona opción: ");
-        switch ($opt) {
+
+        $opt = readline("Selecciona opción: ");
+        if ($opt !== false && function_exists('readline_add_history')) readline_add_history($opt);
+
+        switch (trim($opt)) {
             case '1':
-                $id = leerLinea("Identificador del conjunto: ");
-                $raw = leerLinea("Valores (separados por comas): ");
+                $id  = readline("Identificador del conjunto: "); if ($id !== false) readline_add_history($id);
+                $raw = readline("Valores (separados por comas): "); if ($raw !== false) readline_add_history($raw);
                 $vals = array_filter(array_map('trim', explode(',', $raw)), fn($v) => $v !== '');
-                $nums = array_map('floatval', $vals);
-                $dataSets[$id] = $nums;
-                echo "Conjunto '$id' guardado con " . count($nums) . " valores.\n";
+                $dataSets[$id] = array_map('floatval', $vals);
+                echo "Conjunto '$id' guardado con " . count($dataSets[$id]) . " valores.\n";
                 break;
+
             case '2':
                 if (empty($dataSets)) {
                     echo "No hay conjuntos cargados. Añade uno primero.\n";
                     break;
                 }
-                $id = leerLinea("¿De qué conjunto quieres las estadísticas? ");
+                $id = readline("¿De qué conjunto quieres las estadísticas? "); if ($id !== false) readline_add_history($id);
                 if (!isset($dataSets[$id])) {
                     echo "Conjunto '$id' no existe.\n";
                     break;
                 }
-                $datos = $dataSets[$id];
+                $stats = $estad->generarInforme([$id => $dataSets[$id]]); 
+                $s = $stats[$id];
                 echo "\nEstadísticas para '$id':\n";
-                echo "  Media:   " . $estad->calcularMedia($datos) . "\n";
-                echo "  Mediana: " . $estad->calcularMediana($datos) . "\n";
-                $moda = $estad->calcularModa($datos);
-                echo "  Moda:    " . (empty($moda) ? '—' : implode(', ', $moda)) . "\n";
+                echo "  Media:   " . ($s['media']   ?? '—') . "\n";
+                echo "  Mediana: " . ($s['mediana'] ?? '—') . "\n";
+                $m = $s['moda'];
+                echo "  Moda:    " . (empty($m) ? '—' : implode(', ', $m)) . "\n";
                 break;
+
             case '3':
                 if (empty($dataSets)) {
                     echo "No hay datos para generar informe.\n";
@@ -118,21 +115,21 @@ if (php_sapi_name() === 'cli') {
                 }
                 $informe = $estad->generarInforme($dataSets);
                 echo "\n=== Informe Completo ===\n";
-                foreach ($informe as $id => $stats) {
+                foreach ($informe as $id => $s) {
                     echo "- $id:\n";
-                    echo "    Media:   " . ($stats['media']   === null ? '—' : $stats['media']) . "\n";
-                    echo "    Mediana: " . ($stats['mediana'] === null ? '—' : $stats['mediana']) . "\n";
-                    $m = $stats['moda'];
-                    echo "    Moda:    " . (empty($m) ? '—' : implode(', ', $m)) . "\n";
+                    echo "    Media:   " . ($s['media']   ?? '—') . "\n";
+                    echo "    Mediana: " . ($s['mediana'] ?? '—') . "\n";
+                    echo "    Moda:    " . (empty($s['moda']) ? '—' : implode(', ', $s['moda'])) . "\n";
                 }
                 break;
+
             case '4':
                 echo "¡Hasta luego!\n";
                 exit(0);
+
             default:
                 echo "Opción no válida. Intenta de nuevo.\n";
         }
     }
 }
-
 ?>
