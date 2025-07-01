@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Ejercicio 4: Calculo de estadısticas basicas
+ * Ejercicio 2: Calculo de estadısticas basicas
  * Clase abstracta que define métodos abstractos para calcular estadísticas básicas
  * como media, mediana y moda.
  */
