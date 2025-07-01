@@ -95,12 +95,13 @@ function mostrarSolucion($solucion, $titulo = "Solución")
 function crearEcuacionPersonalizada()
 {
     echo "\nDefina la ecuación diferencial dy/dx = f(x, y)\n";
-    echo "Ejemplo: \$x + \$y, \$x * \$y, -\$y, sin(\$x) + cos(\$y)\n";
+    echo "Ejemplo: x + y, x * y, -y, sin(x) + cos(y)\n";
     $expresion = readline("Ingrese la función: dy/dx = ");
 
     // Devuelve una función anónima usando la expresión escrita por el usuario
     return function ($x, $y) use ($expresion) {
-        $codigo = str_replace(['$x', '$y'], [$x, $y], $expresion);
+        $codigo = str_replace(['x', 'y'], [$x, $y], $expresion);
+        $resultado = null;
         eval('$resultado = ' . $codigo . ';');
         return $resultado;
     };
